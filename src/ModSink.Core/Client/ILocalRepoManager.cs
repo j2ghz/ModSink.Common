@@ -10,12 +10,12 @@ namespace ModSink.Core.Client
     {
         void Delete(HashValue hash);
 
-        Uri GetFileUri(HashValue hash);
+        Uri GetFileUri(HashValue hash, bool temp = false);
 
         bool IsFileAvailable(HashValue hash);
 
         Stream Read(HashValue hash);
 
-        Stream Write(HashValue hash);
+        ILocalDestination Write(HashValue hash);
     }
 }

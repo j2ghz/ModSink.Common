@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using ModSink.Core.Models.Repo;
 using System.IO;
+using System.Reactive.Disposables;
 
 namespace ModSink.Common.Client
 {
@@ -23,9 +24,9 @@ namespace ModSink.Common.Client
             GetFileInfo(hash).Delete();
         }
 
-        public Uri GetFileUri(HashValue hash)
+        public Uri GetFileUri(HashValue hash, bool temp = false)
         {
-            return new Uri(this.localPath, hash.ToString());
+            return new Uri(this.localPath, hash.ToString() + (temp ? ".tmp" : ""));
         }
 
         public bool IsFileAvailable(HashValue hash)
@@ -40,11 +41,17 @@ namespace ModSink.Common.Client
             return file.Open(FileMode.Open, FileAccess.Read);
         }
 
-        public Stream Write(HashValue hash)
+        public ILocalDestination Write(HashValue hash)
         {
+            var tempUri = GetFileUri(hash, true);
             var uri = GetFileUri(hash);
-            var file = new FileInfo(uri.LocalPath);
-            return file.Open(FileMode.Create, FileAccess.Write);
+            var file = new FileInfo(tempUri.LocalPath);
+            var after = new Action(() =>
+            {
+                File.Move(tempUri.LocalPath, uri.LocalPath);
+            });
+            var stream = new Lazy<Stream>(() => file.Open(FileMode.Create, FileAccess.Write));
+            return new LocalDestination(() => { }, stream, after);
         }
 
         private FileInfo GetFileInfo(HashValue hash)

@@ -32,7 +32,7 @@ namespace ModSink.Common.Client
         {
             var files = modpack.Mods.SelectMany(mod => mod.Mod.Files.Select(f => f.Value));
             var filesToDownload = files.Where(f => !this.LocalRepoManager.IsFileAvailable(f));
-            var downloads = filesToDownload.Select(f => new Download(GetDownloadUri(f), new Lazy<Stream>(() => this.LocalRepoManager.Write(f)), f.ToString()));
+            var downloads = filesToDownload.Select(f => new Download(GetDownloadUri(f), this.LocalRepoManager.Write(f), f.ToString()));
             foreach (var download in downloads)
             {
                 this.DownloadManager.Downloads.Add(download);

@@ -10,14 +10,14 @@ namespace ModSink.Common.Client
 {
     public class Download : IDownload
     {
-        public Download(Uri source, Lazy<Stream> destination, string name)
+        public Download(Uri source, ILocalDestination destination, string name)
         {
             this.Source = source;
             this.Destination = destination;
             this.Name = name;
         }
 
-        public Lazy<Stream> Destination { get; }
+        public ILocalDestination Destination { get; }
         public string Name { get; }
         public IObservable<DownloadProgress> Progress { get; private set; }
         public Uri Source { get; }

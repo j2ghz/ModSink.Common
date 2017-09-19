@@ -21,10 +21,13 @@ namespace Modsink.Common.Tests.Client
             var hash = new XXHash64().HashOfEmpty;
             this.manager.IsFileAvailable(hash).Should().Be(false);
             Assert.Throws<FileNotFoundException>(() => this.manager.Read(hash));
-            using (var stream = this.manager.Write(hash))
+            var dest = this.manager.Write(hash);
+            dest.Before();
+            using (var stream = this.manager.Write(hash).Stream)
             {
                 stream.WriteByte(0xff);
             }
+            dest.After();
             this.manager.IsFileAvailable(hash).Should().Be(true);
             using (var stream = this.manager.Read(hash))
             {

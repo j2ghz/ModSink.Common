@@ -15,7 +15,7 @@ namespace ModSink.Core.Client
 
     public interface IDownload
     {
-        Lazy<Stream> Destination { get; }
+        ILocalDestination Destination { get; }
         string Name { get; }
         IObservable<DownloadProgress> Progress { get; }
         Uri Source { get; }

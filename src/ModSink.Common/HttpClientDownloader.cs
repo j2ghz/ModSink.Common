@@ -34,8 +34,9 @@ namespace ModSink.Common
                 report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
 
                 var totalRead = 0;
+                download.Destination.Before();
                 using (var input = await response.Content.ReadAsStreamAsync())
-                using (var output = download.Destination.Value)
+                using (var output = download.Destination.Stream)
                 {
                     byte[] buffer = new byte[16 * 1024];
                     var read = 0;
@@ -49,6 +50,7 @@ namespace ModSink.Common
                         report(length, totalRead.Bytes(), TransferState.Downloading);
                     }
                 }
+                download.Destination.After();
 
                 //Finish
                 report(length, totalRead.Bytes(), TransferState.Finished);
@@ -60,6 +62,6 @@ namespace ModSink.Common
             return progress;
         }
 
-        public IObservable<DownloadProgress> Download(Uri source, Stream destination, string name) => this.Download(new Download(source, new Lazy<Stream>(() => destination), name));
+        public IObservable<DownloadProgress> Download(Uri source, Stream destination, string name) => this.Download(new Download(source, new LocalDestination(() => { }, new Lazy<Stream>(() => destination), () => { }), name));
     }
 }
