@@ -17,12 +17,11 @@ namespace ModSink.Core.Client
 
     public interface IDownload : IReactiveObject
     {
-        Lazy<Task<Stream>> Destination { get; }
         string Name { get; }
         IObservable<DownloadProgress> Progress { get; }
         Uri Source { get; }
         DownloadState State { get; }
 
-        void Start(IDownloader downloader);
+        void Start(IDownloader downloader, ILocalStorageService local);
     }
 }

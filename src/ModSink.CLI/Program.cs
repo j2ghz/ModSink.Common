@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using DynamicData;
 using Humanizer;
 using Microsoft.Extensions.CommandLineUtils;
 using ModSink.Common;
@@ -83,6 +84,10 @@ namespace ModSink.CLI
                         Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
                         await client.DownloadMissingFiles(modpack);
                     }
+                    client.DownloadService.Downloads.Connect()
+                        .FilterOnProperty(d => d.State, d => d.State == DownloadState.Downloading)
+                        .Subscribe(cs =>
+                            cs.ForEach(c => DumpDownloadProgress(c.Item.Current.Progress, c.Item.Current.Name)));
                     Console.ReadKey();
                     return 0;
                 });

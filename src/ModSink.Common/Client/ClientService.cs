@@ -37,7 +37,7 @@ namespace ModSink.Common.Client
             await Task.WhenAll(
                 modpack.Mods
                     .SelectMany(m => m.Mod.Files)
-                    .Select(fh => new Task(async () =>
+                    .Select(fh => Task.Factory.StartNew(async () =>
                     {
                         if (!await LocalStorageService.IsFileAvailable(fh.Value))
                             DownloadService.Add(new Download(GetDownloadUri(fh.Value),
